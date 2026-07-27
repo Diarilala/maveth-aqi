@@ -105,3 +105,12 @@ def backfill_city(city_name: str, query: str, days_back: int, chunk_days: int) -
         n_readings = len(data.get("list", []))
         log.info(f"{city_name} {fname}: saved ({n_readings} hourly readings)")
         time.sleep(REQUEST_PAUSE_SECONDS)
+
+def main():
+    RAW_DIR.mkdir(exist_ok=True)
+    for city in CITIES:
+        backfill_city(city["name"], city["q"], DAYS_BACK, CHUNK_DAYS)
+    log.info("Backfill complete.")
+
+if __name__ == "__main__":
+    main()
