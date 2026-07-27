@@ -1,7 +1,9 @@
+import logging
 import os
 from pathlib import Path
 
 from dotenv import load_dotenv
+import requests
 
 
 load_dotenv()
@@ -21,3 +23,30 @@ CITIES = [
     {"name": "Tunis", "q": "Tunis,TN"},
     {"name": "Vancouver", "q": "Vancouver,CA"},
 ]
+
+DAYS_BACK = 90
+CHUNK_DAYS = 20
+REQUEST_PAUSE_SECONDS = 1
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+)
+log = logging.getLogger(__name__)
+
+def slugify(name: str) -> str:
+    return name.strip().lower().replace(" ", "_")
+
+def geocode(query: str) -> tuple[float, float]:
+    resp = requests.get(
+        GEOCODE_URL,
+        params={"q": query, "limit": 1, "appid": API_KEY},
+        timeout=15,
+    )
+    resp.raise_for_status
+    results = resp.json()
+    if not results:
+        raise ValueError(f"No geocoding results for query: {query}")
+    lat = results[0]["lat"]
+    lon = results[0]["lon"]
+    return lat, lon
