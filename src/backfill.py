@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import logging
 import os
 from pathlib import Path
@@ -66,3 +66,13 @@ def fetch_aqi_window(lat: float, lon: float, start: datetime, end: datetime) -> 
     )
     resp.raise_for_status()
     return resp.json()
+
+def date_windows(days_back: int, chunk_days: int):
+    now = datetime.now(timezone.utc)
+    range_start = now - timedelta(days=days_back)
+
+    cursor = range_start
+    while cursor < now:
+        window_end = min(cursor + timedelta(days=chunk_days), now)
+        yield cursor, window_end
+        cursor = window_end
