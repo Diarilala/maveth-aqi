@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta, timezone
+import json
 import logging
 import os
 from pathlib import Path
+import time
 
 from dotenv import load_dotenv
 import requests
@@ -76,3 +78,30 @@ def date_windows(days_back: int, chunk_days: int):
         window_end = min(cursor + timedelta(days=chunk_days), now)
         yield cursor, window_end
         cursor = window_end
+
+def backfill_city(city_name: str, query: str, days_back: int, chunk_days: int) -> None:
+    slug = slugify(city_name)
+    city_dir = RAW_DIR / slug
+    city_dir.mkdir(parents=True, exist_ok=True)
+    lat, lon = geocode(query)
+    log.info(f"{city_name}: resolved to lat={lat}, lon={lon}")
+
+    for start, end in date_windows(days_back, chunk_days):
+        fname = f"{start.date().isoformat()}_{end.date().isoformat()}.json"
+        out_path = city_dir / fname
+        if out_path.exists():
+            log.info(f"{city_name}: {fname} already exists, skipping")
+            continue
+        try:
+            data = fetch_aqi_window(lat, lon, start, end)
+        except requests.HTTPError as e:
+            log.error(f"{city_name} {fname}: HTTP error {e.response.status_code} - {e}")
+            continue
+        except Exception as e:
+            log.error(f"{city_name} {fname}: unexpected error - {e}")
+            continue
+
+        out_path.write_text(json.dumps(data, indent=2, ensure_ascii=False))
+        n_readings = len(data.get("list", []))
+        log.info(f"{city_name} {fname}: saved ({n_readings} hourly readings)")
+        time.sleep(REQUEST_PAUSE_SECONDS)
