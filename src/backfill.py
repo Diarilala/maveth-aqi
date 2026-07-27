@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 import os
 from pathlib import Path
@@ -43,10 +44,25 @@ def geocode(query: str) -> tuple[float, float]:
         params={"q": query, "limit": 1, "appid": API_KEY},
         timeout=15,
     )
-    resp.raise_for_status
+    resp.raise_for_status()
     results = resp.json()
     if not results:
         raise ValueError(f"No geocoding results for query: {query}")
     lat = results[0]["lat"]
     lon = results[0]["lon"]
     return lat, lon
+
+def fetch_aqi_window(lat: float, lon: float, start: datetime, end: datetime) -> dict:
+    resp = requests.get(
+        AIR_POLLUTION_HISTORY_URL,
+        params={
+            "lat": lat,
+            "lon": lon,
+            "start": int(start.timestamp()),
+            "end": int(end.timestamp()),
+            "appid": API_KEY,
+        },
+        timeout=30,
+    )
+    resp.raise_for_status()
+    return resp.json()
