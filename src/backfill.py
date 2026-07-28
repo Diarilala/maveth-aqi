@@ -27,7 +27,7 @@ CITIES = [
     {"name": "Vancouver", "q": "Vancouver,CA"},
 ]
 
-DAYS_BACK = 90
+DAYS_BACK = 365
 CHUNK_DAYS = 20
 REQUEST_PAUSE_SECONDS = 1
 
