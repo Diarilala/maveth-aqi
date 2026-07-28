@@ -14,7 +14,7 @@ CITIES = [
     {"name": "Vancouver", "lat": 49.2827, "lon": -123.1207},
 ]
 
-AIR_POLLUTION_URL = "http://api.openweathermap.org/data/2.5/air_pollution"
+AIR_POLLUTION_URL = "https://api.openweathermap.org/data/2.5/air_pollution"
 RAW_DIR = Path(__file__).parent.parent / 'raw'
 
 def slugify(name: str) -> str:
