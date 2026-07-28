@@ -20,7 +20,7 @@ RAW_DIR = Path(__file__).parent.parent / 'raw'
 def slugify(name: str) -> str:
     return name.strip().lower().replace(" ", "_")
 
-def fetch_current_aqi(lat: float, lon: float) -> dict:
+def fetch_current_aqi(lat: float, lon: float, api_key: str) -> dict:
     resp = requests.get(
         AIR_POLLUTION_URL,
         params={"lat": lat, "lon": lon, "appid": api_key},
