@@ -4,7 +4,7 @@
 
 - **Villes** (5 minimum) : Hanoi (VN), Manila (PH), Taipei (TW), Tunis (TN), Vancouver (CA) — diversité de zones géographiques et de profils de pollution
 
-- **Orchestrateur** : GitHub Actions (workflow cron horaire) + [cron-job.org](https://cron-job.org) — GitHub Actions configure et exécute le pipeline, gratuit et sans serveur à héberger. Mais GitHub Actions utilise un système de file d'attente : le déclenchement horaire n'est pas garanti à l'heure pile. cron-job.org appelle le workflow via son `workflow_dispatch` toutes les heures pour forcer une exécution régulière, réglant ce problème sans dépendre d'une machine du groupe allumée en continu (contrairement à un orchestrateur auto-hébergé comme Airflow).
+- **Orchestrateur** : GitHub Actions (workflow cron horaire) + [cron-job](https://cron-job.org) — GitHub Actions configure et exécute le pipeline, gratuit et sans serveur à héberger. Mais GitHub Actions utilise un système de file d'attente : le déclenchement horaire n'est pas garanti à l'heure pile. cron-job appelle le workflow via son `workflow_dispatch` toutes les heures pour forcer une exécution régulière, réglant ce problème sans dépendre d'une machine du groupe allumée en continu (contrairement à un orchestrateur auto-hébergé comme Airflow).
 
 - **Stockage raw/clean** : fichiers versionnés dans le repo Git
   - `raw/` : un fichier JSON par ville et par appel, jamais modifié après écriture — cette trace brute immuable sert aussi de preuve : l'historique des commits Git montre l'exécution automatisée et régulière du pipeline
