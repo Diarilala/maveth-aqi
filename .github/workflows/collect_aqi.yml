@@ -23,17 +23,25 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install requests
+        run: pip install -r requirements.txt
 
       - name: Fetch current AQI for all cities
         env:
           OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
         run: python3 src/collect_aqi.py
 
-      - name: Commit and push new raw files
+      - name: Transform raw/ into clean/air_quality.csv
+        run: python3 src/transform.py
+
+      - name: Load clean/ into the Neon warehouse
+        env:
+          NEON_CONNECTION_STRING: ${{ secrets.NEON_CONNECTION_STRING }}
+        run: python3 src/load_warehouse.py
+
+      - name: Commit and push new raw/ and clean/ files
         run: |
           git config user.name "aqi-collector-bot"
           git config user.email "actions@github.com"
-          git add raw/
+          git add raw/ clean/
           git diff --cached --quiet || git commit -m "Hourly AQI collection: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
           git push
